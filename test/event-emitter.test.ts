@@ -55,14 +55,31 @@ describe("Dummy test", () => {
     expect(emitter._subscriptions).toEqual({});
   })
 
-  it('Can unregister listeners', () => {
+  it('Will unregister listeners and clear the list of subscribers', () => {
     const emitter = new EventEmitter();
 
-    const spy = jest.fn();
+    const spy = (data: any) => data;
+    emitter.on('start', spy);
 
     emitter.send('start', 'hello');
+    emitter.off('start', spy);
 
     expect(emitter._subscriptions).toEqual({});
+  })
+
+  it('Will unregister listeners', () => {
+    const emitter = new EventEmitter();
+
+    const spy = (data: any) => data;
+    const spy2 = (data: any) => data;
+
+    emitter.on('start', spy);
+    emitter.on('start', spy2);
+
+    emitter.send('start', 'hello');
+    emitter.off('start', spy);
+
+    expect(emitter._subscriptions).toEqual({ start: [spy2] });
   })
 
 })

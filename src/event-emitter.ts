@@ -14,16 +14,21 @@ export default class EventEmitter {
     return this;
   }
 
-  off(channel: string, handler: Function) {
+  off(channel: string, handler: (data: any) => void) {
     if (!this._subscriptions[channel]) {
       throw new Error(`There is no channel called ${channel}`)
     }
-    const currentHandler = this._subscriptions[channel].find(h => h === handler);
-    if (!currentHandler) {
+    const currentHandlerIndex = this._subscriptions[channel].findIndex(h => h === handler);
+    if (currentHandlerIndex === -1) {
       throw new Error(`There is no handler ${handler.name}`)
     }
-
-    currentHandler()
+    this._subscriptions[channel] = [
+      ...this._subscriptions[channel].slice(0, currentHandlerIndex),
+      ...this._subscriptions[channel].slice(currentHandlerIndex + 1),
+    ]
+    if (this._subscriptions[channel].length === 0) {
+      delete this._subscriptions[channel];
+    }
 
   }
 
